@@ -1,23 +1,25 @@
-# library(httr)
-# library(stringi)
-# library(magrittr)
-# library(dplyr)
-# library(parallel)
-# library(pbapply)
-# library(RSQLite)
-# library(beepr)
+
+library(stringi)
+library(parallel)
 
 
-popraw.ortografie <- function(dane, proby = 4, przerwa = 10){
+# Poprawia ortografie, proby i przerwa to zmienne ktore definiuja ilosc prob
+# polaczenia z serwerem i dlugosc przerwy pomiedzy kolejnymi probami (w sek)
+
+
+popraw.ortografie <- function(dane, proby = 4, przerwa = 10, il.watkow = 20){
   
   
-  klaster <- makeCluster(5 * detectCores())
+  
+  # zrownoleglanie - mocno przyspiesza obliczenia, dla 20 u mnie dziala najszybciej
+  
+  klaster <- makeCluster(il.watkow)
   
 
   
   for (j in 1:proby) {
     tryCatch({
-      
+ 
       
         parSapply(klaster, dane$body, function(napis) {
           
@@ -54,10 +56,13 @@ popraw.ortografie <- function(dane, proby = 4, przerwa = 10){
   invisible()
   
   
-  if (Sys.info()[['sysname']] == "Windows"){
+  
+  
+  if (Sys.info()[['sysname']] == "Windows" & stri_enc_get() == "windows-1250"){
       
      body <- stri_encode(body, from = "utf-8")
   }
+ 
   
   
   body <- as.character(body)

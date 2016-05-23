@@ -1,7 +1,9 @@
+require(RSQLite)
 
 
 
-
+# baza - sciezka do bazy
+# dane - dane jak u Bicka
 
 czy.aktualizowac <- function(dane, baza){
   
@@ -19,7 +21,7 @@ czy.aktualizowac <- function(dane, baza){
   
   
   
-  # jesli aktualizowac tabele dane, to ktore wiersze?
+  # jesli aktualizowac tabele dane, to ktore wiersze
   
   if ("dane" %in% dbListTables(db)){
     
@@ -34,7 +36,7 @@ czy.aktualizowac <- function(dane, baza){
   
   
   
-  # jesli aktualizowac tabele rozklady, to ktore wiersze?
+  # jesli aktualizowac tabele rozklady, to ktore wiersze
   
   if ("rozklady" %in% dbListTables(db)){
     
@@ -49,7 +51,11 @@ czy.aktualizowac <- function(dane, baza){
   suppressWarnings(dbDisconnect(db))
   
   
-  
+  # zwraca:
+  # co.akt$dane - wiersze z dostarczonych dane, ktorych nie ma w tabeli dane (po ID)
+  # co.akt$rozklady - jak wyzej dla tabeli dane
+  # czy.akt$dane - TRUE jesli w dostarczonych danych sa ID ktorych nie ma w tabeli dane
+  # czy.akt$rozklady - jak wyzej dla tabeli rozklady
   
   list(
          co.akt  = list(dane=id.nowe.dane, rozklady=id.nowe.rozklady),

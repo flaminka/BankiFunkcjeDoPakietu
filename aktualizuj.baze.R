@@ -1,4 +1,4 @@
-
+require(stringi)
 
 
 
@@ -7,6 +7,7 @@ aktualizuj.baze <- function(dane, baza){
   
   #                DANE W POSTACI TAKIEJ, JAK PRZYKLADOWA
 
+  
   
   # stopifnot( is.character(baza), 
   #            length(baza) == 1,
@@ -35,12 +36,13 @@ aktualizuj.baze <- function(dane, baza){
   
   #---------------SPRAWDZENIE CZY TRZEBA AKTUALIZOWAC BAZE---------------------
   
+  
   aktualizacja     <- czy.aktualizowac(dane, "baza.db")
   
-  czy.akt.dane     <- aktualizacja$czy.akt$dane
-  czy.akt.rozklady <- aktualizacja$czy.akt$rozklady
-  id.nowe.dane     <- aktualizacja$co.akt$dane
-  id.nowe.rozklady <- aktualizacja$co.akt$rozklady
+  czy.akt.dane     <- aktualizacja$czy.akt$dane       # czy trzeba aktualizowac tabele dane
+  czy.akt.rozklady <- aktualizacja$czy.akt$rozklady   # czy trzeba aktualizowac tabele rozklady
+  id.nowe.dane     <- aktualizacja$co.akt$dane        # ktorych wierszy z danych nie ma w tabeli dane
+  id.nowe.rozklady <- aktualizacja$co.akt$rozklady    # ktorych wierszy z danych nie ma w tabeli rozklady
   
   
   
@@ -66,15 +68,19 @@ aktualizuj.baze <- function(dane, baza){
 
 
   
-  # na windowsie trzeba poprawic kodowanie
-  if (Sys.info()[['sysname']] == "Windows"){
+  # na windowsie trzeba czasem poprawic kodowanie
+  
+  if (Sys.info()[['sysname']] == "Windows" &
+      !stri_enc_detect(dane$body[1])[[1]]$Encoding[1] == "windows-1250" &
+       stri_enc_get() == "windows-1250"){
+    
            dane$body <- stri_encode(dane$body,      from = "utf-8")
       dane$user_name <- stri_encode(dane$user_name, from = "utf-8")
   }
   
   
-  
-  
+
+
 
   
   
@@ -90,6 +96,9 @@ aktualizuj.baze <- function(dane, baza){
         cat("\n", "Rozpoczynam poprawe ortografii")
     
           
+        # do poprawy ortografii ida tylko te wiersze, ktorych nie bylo
+        # w tabeli dane lub w tabeli rozklady
+    
           wiersze   <- unique(c(id.nowe.dane, id.nowe.rozklady))
           dane$body <- popraw.ortografie(dane[wiersze, ])
         
@@ -192,7 +201,7 @@ aktualizuj.baze <- function(dane, baza){
   
   
   #---------------------------KONIEC (DZWIEK)--------------------------------
-  beep()
+ # beep()
   
   
 }

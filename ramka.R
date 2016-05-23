@@ -1,5 +1,9 @@
+require(pbapply)
+require(stringi)
 
 
+# rozklad - policzony przez serwer, jak na zajeciach
+# dane - jak u Bicka
 
 ramka <- function(rozklad, dane){
   
@@ -32,6 +36,8 @@ ramka <- function(rozklad, dane){
   # zrobienie z 'ramki' data.frame'u
   ramka <- pblapply(ramka, function(macierz) t(as.data.frame(macierz)))
   
+  
+  #jesli sa jakies puste wiersze to usun
   puste <- which(sapply(ramka, function(macierz){ncol(macierz)!=8}))
   
   
@@ -51,7 +57,8 @@ ramka <- function(rozklad, dane){
   
   
   # potrzebne na windowsie:
-  if (Sys.info()[['sysname']] == "Windows"){
+  
+  if (Sys.info()[['sysname']] == "Windows" & stri_enc_get() == "windows-1250"){
     
           ramka$baza <- stri_encode(ramka$baza,     from = "utf-8")
       ramka$oryginal <- stri_encode(ramka$oryginal, from = "utf-8")

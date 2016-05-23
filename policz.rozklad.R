@@ -1,12 +1,16 @@
+require(parallel)
 
 
 
-policz.rozklad <- function(dane, proby = 4, przerwa = 10){
+# Poprawia ortografie, proby i przerwa to zmienne ktore definiuja ilosc prob
+# polaczenia z serwerem i dlugosc przerwy pomiedzy kolejnymi probami (w sek)
+
+policz.rozklad <- function(dane, proby = 4, przerwa = 10, watki = 20){
   
   
   
   
-  klaster <- makeCluster(5 * detectCores())
+  klaster <- makeCluster(watki)
   
   
   for (j in 1:proby) {
