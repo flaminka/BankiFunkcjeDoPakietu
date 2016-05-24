@@ -1,8 +1,11 @@
 require(RSQLite)
 
 
-# ramka - data.frame zrobiony z rozkladow
-# baza - sciezka do bazy
+#' aktualizuje tabele rozklady w bazie baza
+
+#' ramka - data.frame zrobiony z rozkladow funkcja ramka()
+#' baza - sciezka do bazy lub gdzie ma zostac utworzona nowa
+
 
 
 aktualizuj.rozklady <- function(baza, ramka){
@@ -15,20 +18,21 @@ aktualizuj.rozklady <- function(baza, ramka){
     
     dbSendQuery(db, "create table rozklady (
                 id smallint,
-                data varchar, 
-                godzina varchar, 
-                dzien tinyint,
-                baza varchar,
-                oryginal varchar, 
-                tag varchar, 
-                rozklad varchar
+                date date,
+                time nvarchar, 
+                weekday tinyint,
+                baza nvarchar,
+                oryginal nvarchar, 
+                tag nvarchar, 
+                rozklad nvarchar,
+                page_name nvarchar
     )")
   }
 
 
   
     
-    dbSendPreparedQuery(db, "insert into rozklady values (?,?,?,?,?,?,?,?)",
+    dbSendPreparedQuery(db, "insert into rozklady values (?,?,?,?,?,?,?,?,?)",
                         ramka)
     
 

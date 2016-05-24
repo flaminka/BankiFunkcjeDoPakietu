@@ -1,23 +1,29 @@
 
 library(stringi)
 library(parallel)
+require(httr)
 
 
-# Poprawia ortografie, proby i przerwa to zmienne ktore definiuja ilosc prob
-# polaczenia z serwerem i dlugosc przerwy pomiedzy kolejnymi probami (w sek)
+#' Poprawia ortografie, il.prob i przerwa to zmienne ktore definiuja ilosc prob
+#' polaczenia z serwerem i dlugosc przerwy pomiedzy kolejnymi probami (w sek)
+#' 
+#' dane - pobrane z facebooka funkcja read.page(), ramka
+#' il.watkow - argument funkcji makeCluster()
+#' 
+#' zwraca wektor napisow
 
 
-popraw.ortografie <- function(dane, proby = 4, przerwa = 10, il.watkow = 20){
+popraw.ortografie <- function(dane, il.watkow, il.prob, przerwa){
   
   
   
-  # zrownoleglanie - mocno przyspiesza obliczenia, dla 20 u mnie dziala najszybciej
+
   
   klaster <- makeCluster(il.watkow)
   
 
   
-  for (j in 1:proby) {
+  for (j in 1:il.prob) {
     tryCatch({
  
       
@@ -41,8 +47,9 @@ popraw.ortografie <- function(dane, proby = 4, przerwa = 10, il.watkow = 20){
     
     break
     }, error = function(err) {
-      cat(paste0("\n", j,". Próba poprawy ortografii nie powiodla sie\n"))
-      if (j == proby) {
+      cat(paste0("\n", j,". Próba poprawy ortografii nie powiodla sie. 
+                 Próbuję ponownie.\n"))
+      if (j == il.prob) {
         stopCluster(klaster)
         stop(paste("Poprawa ortografii nie powiodla sie!"))
       }
@@ -57,20 +64,20 @@ popraw.ortografie <- function(dane, proby = 4, przerwa = 10, il.watkow = 20){
   
   
   
+
+   body <- as.character(body)
+
+
   
   if (Sys.info()[['sysname']] == "Windows" & stri_enc_get() == "windows-1250"){
-      
-     body <- stri_encode(body, from = "utf-8")
+
+     suppressWarnings(body <- stri_encode(body, from = "utf-8"))
   }
  
+
   
-  
-  body <- as.character(body)
+
   body
   
 }
-
-
-
-
 

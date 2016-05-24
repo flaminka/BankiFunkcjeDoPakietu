@@ -1,19 +1,28 @@
 require(parallel)
+require(httr)
+
+
+#' Poprawia ortografie, proby i przerwa to zmienne ktore definiuja ilosc prob
+#' polaczenia z serwerem i dlugosc przerwy pomiedzy kolejnymi probami (w sek)
+#' 
+#' dane - pobrane z fejsa funkcja read.page(), ramka danych
+#' il.watkow - argument funkcji makeCluster()
+#' il.prob - w przypadku niepowodzenia probuje jeszcze
+#' przerwa - przerwa pomiedzy probami
+#' 
+#' zwraca rozklad - liste list
 
 
 
-# Poprawia ortografie, proby i przerwa to zmienne ktore definiuja ilosc prob
-# polaczenia z serwerem i dlugosc przerwy pomiedzy kolejnymi probami (w sek)
-
-policz.rozklad <- function(dane, proby = 4, przerwa = 10, watki = 20){
+policz.rozklad <- function(dane, il.watkow, il.prob, przerwa){
   
   
   
   
-  klaster <- makeCluster(watki)
+  klaster <- makeCluster(il.watkow)
   
   
-  for (j in 1:proby) {
+  for (j in 1:il.prob) {
     tryCatch({
       
       
@@ -37,8 +46,8 @@ policz.rozklad <- function(dane, proby = 4, przerwa = 10, watki = 20){
       
       break
     }, error = function(err) {
-      cat(paste0("\n", j,". proba rozkladu nie powiodla sie\n"))
-      if (j == proby) {
+      cat(paste0("\n", j,". Proba rozkladu nie powiodla sie. Próbuję ponownie.\n"))
+      if (j == il.prob) {
         
         stopCluster(klaster)
         
@@ -52,7 +61,19 @@ policz.rozklad <- function(dane, proby = 4, przerwa = 10, watki = 20){
   suppressWarnings(stopCluster(klaster))
   
   
-  rozklad
+  
+  usun <- which(sapply(1:length(rozklad), function(i) 
+    
+                         all(class(rozklad[[i]]) == "list")
+                    
+                      ) != TRUE)
+                
+    
+  
+  
+  
+  if (length(usun) > 0) {rozklad[-usun]} else {rozklad}
+  
 
   
 }
